@@ -1,0 +1,8 @@
+{
+  "type": "page",
+  "title": "${__title}",
+  "body": [
+    "${__queryForm}",
+    "${__crud}"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "page",
+  "title": "审批单",
+  "body": [
+    {
+      "type": "crud",
+      "api": {
+        "method": "get",
+        "url": "/api/approvals"
+      },
+      "columns": [
+        {
+          "name": "title",
+          "label": "标题"
+        },
+        {
+          "name": "status",
+          "label": "状态"
+        }
+      ]
+    }
+  ]
+}

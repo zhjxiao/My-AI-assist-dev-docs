@@ -1,14 +1,13 @@
-# See previous message for full content
-# This file contains the full OpenAPI definition for:
-# Auth / User / Org / Approval modules
-# Unified ApiResponse / PageResult
-# Bearer Auth
-# Copy the full YAML from the previous response here in real project usage.
 openapi: 3.0.3
 info:
   title: Admin System API
   version: 1.0.0
 servers:
   - url: /api
-paths: {}
-components: {}
+paths:
+  /users:
+    get:
+      summary: Query users
+      responses:
+        "200":
+          description: OK
