@@ -1,1 +1,3 @@
-# 动作目录（自动生成）
+# Action Catalog
+
+Generated from x-permission and x-actions.

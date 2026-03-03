@@ -1,1 +1,4 @@
-# 字段映射规则
+# Field Mapping
+
+string -> input-text
+number -> input-number

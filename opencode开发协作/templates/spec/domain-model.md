@@ -1,3 +1,6 @@
-# 领域模型定义
+# Domain Model
 
-包含用户、角色、菜单、审批等模型说明。
+- User
+- Role
+- Menu
+- Approval

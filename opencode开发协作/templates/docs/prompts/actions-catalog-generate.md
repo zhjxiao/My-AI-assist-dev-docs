@@ -1,1 +1,1 @@
-# 动作目录生成 Prompt
+# Actions Catalog Generator Prompt

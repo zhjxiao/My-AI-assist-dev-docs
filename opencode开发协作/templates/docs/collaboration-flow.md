@@ -1,1 +1,3 @@
-# 前后端 + UI + AI 协作流程
+# Collaboration Flow
+
+OpenAPI as single source of truth.

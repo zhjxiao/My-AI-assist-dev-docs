@@ -1,1 +1,5 @@
-# 权限点清单（自动生成）
+# Permissions (Auto Generated)
+
+- user:create
+- user:delete
+- role:update
