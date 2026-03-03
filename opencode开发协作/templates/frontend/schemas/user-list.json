@@ -1,0 +1,27 @@
+{
+  "type": "page",
+  "title": "用户管理",
+  "body": [
+    {
+      "type": "crud",
+      "api": {
+        "method": "get",
+        "url": "/api/users"
+      },
+      "columns": [
+        {
+          "name": "username",
+          "label": "登录名"
+        },
+        {
+          "name": "realName",
+          "label": "姓名"
+        },
+        {
+          "name": "status",
+          "label": "状态"
+        }
+      ]
+    }
+  ]
+}
