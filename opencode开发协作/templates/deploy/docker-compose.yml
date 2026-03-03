@@ -1,0 +1,17 @@
+version: "3.8"
+services:
+  backend:
+    image: maven:3.9-eclipse-temurin-8
+    working_dir: /workspace
+    volumes:
+      - ../backend-springboot:/workspace
+    command: ["bash","-lc","mvn -q spring-boot:run"]
+    ports: ["8080:8080"]
+  admin:
+    image: nginx:alpine
+    volumes: ["../frontends/admin-amis:/usr/share/nginx/html:ro"]
+    ports: ["7001:80"]
+  ops:
+    image: nginx:alpine
+    volumes: ["../frontends/ops-amis:/usr/share/nginx/html:ro"]
+    ports: ["7002:80"]

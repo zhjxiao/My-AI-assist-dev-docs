@@ -1,0 +1,6 @@
+{
+  "user.list": "./schemas/user.list.json",
+  "approval.list": "./schemas/approval.list.json",
+  "rbac.role.list": "./schemas/user.list.json",
+  "sys.menu.list": "./schemas/user.list.json"
+}

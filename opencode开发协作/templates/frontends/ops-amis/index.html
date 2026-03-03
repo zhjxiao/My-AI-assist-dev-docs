@@ -1,0 +1,51 @@
+<!doctype html><html><head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>OPS Portal (AMis)</title>
+<link rel="stylesheet" href="https://unpkg.com/amis@6.7.0/sdk/sdk.css" />
+<script src="https://unpkg.com/amis@6.7.0/sdk/sdk.js"></script>
+<style>
+body{margin:0;height:100vh;display:flex;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;}
+#sidebar{width:260px;border-right:1px solid #eee;padding:12px;overflow:auto;}
+#main{flex:1;padding:12px;overflow:auto;}
+.menu-item{padding:8px 10px;cursor:pointer;border-radius:8px;}
+.menu-item:hover{background:#f6f6f6;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.tab{padding:6px 10px;border:1px solid #ddd;border-radius:999px;cursor:pointer;}
+.tab.active{background:#111;color:#fff;border-color:#111;}
+.muted{color:#666;font-size:12px;}
+</style></head><body>
+<div id="sidebar">
+  <div style="font-weight:700;margin-bottom:10px;">OPS Portal (AMis)</div>
+  <div class="muted">主题提示：运营轻量：只暴露少量入口</div>
+  <div style="height:10px;"></div>
+  <div id="menu"></div>
+  <div style="margin-top:12px;" class="muted">
+    <div>OpenAPI: <a href="#" id="openapiLink">/spec/openapi.yaml</a></div>
+  </div>
+</div>
+<div id="main"><div class="tabs" id="tabs"></div><div id="amisRoot"></div></div>
+<script>
+const amisRoot=document.getElementById('amisRoot'),menuRoot=document.getElementById('menu'),tabsRoot=document.getElementById('tabs');
+async function getJSON(u){const r=await fetch(u); if(!r.ok) throw new Error('HTTP '+r.status); return await r.json();}
+function join(b,p){return (b||'').replace(/\/$/,'')+'/'+(p||'').replace(/^\//,'');}
+let cfg=null,routeMap=null,ctx={apiBase:'',me:null,perms:[],defaultScope:{}};
+const tabs=[]; let active=null;
+function renderTabs(){tabsRoot.innerHTML=''; tabs.forEach(t=>{const e=document.createElement('div'); e.className='tab'+(t.key===active?' active':''); e.textContent=t.title; e.onclick=()=>openTab(t); tabsRoot.appendChild(e);});}
+async function openTab(t){active=t.key; renderTabs(); const schema=await getJSON(t.schemaUrl);
+const data={apiBase:ctx.apiBase,__menuId:t.menuId,__me:ctx.me,__perms:ctx.perms,__defaultScope:ctx.defaultScope};
+amis.embed(amisRoot, schema, data, { fetcher: async (api)=>{ const m=(api.method||'get').toUpperCase(); const url=api.url.startsWith('http')?api.url:join(ctx.apiBase,api.url);
+const res=await fetch(url,{method:m,headers:{'Content-Type':'application/json'},body:(api.data&&m!=='GET')?JSON.stringify(api.data):undefined});
+return {ok:true,status:res.status,data:await res.json()}; } }); }
+function addTab(t){const ex=tabs.find(x=>x.key===t.key); if(!ex) tabs.push(t); openTab(ex||t); renderTabs();}
+async function init(){cfg=await getJSON('./config/app-config.json'); routeMap=await getJSON('./route-mapping.json'); ctx.apiBase=cfg.apiBase||'';
+document.getElementById('openapiLink').href=join(ctx.apiBase,'/spec/openapi.yaml');
+await getJSON(join(ctx.apiBase,'/api/platform/capabilities')); // probe
+const me=await getJSON(join(ctx.apiBase,'/api/auth/me')); ctx.me=me.data; ctx.perms=me.data.permissions||[]; ctx.defaultScope=me.data.defaultScope||{};
+const tree=await getJSON(join(ctx.apiBase,'/api/menus/tree?scene=SIDEBAR')); const menus=(tree.data||[]).filter(x=>x.type==='MENU');
+menuRoot.innerHTML=''; menus.forEach(m=>{const schemaUrl=routeMap[m.routeKey]; const el=document.createElement('div'); el.className='menu-item';
+el.textContent=m.title+(schemaUrl?'':'（未映射）'); el.style.opacity=schemaUrl?'1':'0.5';
+el.onclick=()=>{ if(!schemaUrl) return; addTab({key:m.routeKey,title:m.title,menuId:m.id,schemaUrl}); }; menuRoot.appendChild(el);});
+const first=menus.find(m=>routeMap[m.routeKey]); if(first) addTab({key:first.routeKey,title:first.title,menuId:first.id,schemaUrl:routeMap[first.routeKey]});
+}
+init().catch(e=>{amisRoot.innerHTML='<pre style="color:red">'+String(e.stack||e)+'</pre>';});
+</script></body></html>

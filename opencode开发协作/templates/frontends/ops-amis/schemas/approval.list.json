@@ -1,0 +1,12 @@
+{
+  "type": "page",
+  "title": "OPS Portal (AMis) - 审批中心",
+  "body": [
+    {
+      "type": "alert",
+      "level": "info",
+      "showIcon": true,
+      "body": "模板页面：审批业务自行扩展。"
+    }
+  ]
+}

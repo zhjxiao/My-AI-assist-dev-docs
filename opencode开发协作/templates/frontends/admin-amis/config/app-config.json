@@ -1,0 +1,5 @@
+{
+  "appTitle": "Admin Portal (AMis)",
+  "apiBase": "http://localhost:8080",
+  "themeHint": "管理后台：入口更全"
+}

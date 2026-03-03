@@ -1,0 +1,4 @@
+{
+  "user.list": "./schemas/user.list.json",
+  "approval.list": "./schemas/approval.list.json"
+}

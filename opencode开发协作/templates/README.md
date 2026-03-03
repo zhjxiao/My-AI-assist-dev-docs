@@ -1,13 +1,28 @@
-# Enterprise AMis Platform Demo (Spring Boot)
+# 多前端模板（同一后端）
 
-可跑 Demo：Spring Boot 后端 + 静态 AMis 单页（CDN 引入，无需前端构建）。
-
-## 启动
+## 本地启动
+后端：
 ```bash
 cd backend-springboot
 mvn spring-boot:run
 ```
 
-访问：
-- App：http://localhost:8080/
-- OpenAPI YAML：http://localhost:8080/spec/openapi.yaml
+前端 Admin：
+```bash
+cd frontends/admin-amis
+python -m http.server 7001
+```
+
+前端 OPS：
+```bash
+cd frontends/ops-amis
+python -m http.server 7002
+```
+
+默认后端：http://localhost:8080
+- OpenAPI: http://localhost:8080/spec/openapi.yaml
+- Capabilities: http://localhost:8080/api/platform/capabilities
+
+## 核心机制
+- 后端菜单返回 routeKey
+- 每个前端维护 route-mapping.json（routeKey -> schemaUrl）

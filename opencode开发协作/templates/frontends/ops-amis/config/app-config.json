@@ -1,0 +1,5 @@
+{
+  "appTitle": "OPS Portal (AMis)",
+  "apiBase": "http://localhost:8080",
+  "themeHint": "运营轻量：只暴露少量入口"
+}

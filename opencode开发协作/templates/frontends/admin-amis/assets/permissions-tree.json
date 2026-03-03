@@ -1,0 +1,38 @@
+[
+  {
+    "label": "User",
+    "value": "user",
+    "children": [
+      {
+        "label": "user:query",
+        "value": "user:query"
+      },
+      {
+        "label": "user:create",
+        "value": "user:create"
+      },
+      {
+        "label": "user:detail",
+        "value": "user:detail"
+      },
+      {
+        "label": "user:update",
+        "value": "user:update"
+      },
+      {
+        "label": "user:delete",
+        "value": "user:delete"
+      }
+    ]
+  },
+  {
+    "label": "Platform",
+    "value": "platform",
+    "children": [
+      {
+        "label": "platform:caps",
+        "value": "platform:caps"
+      }
+    ]
+  }
+]

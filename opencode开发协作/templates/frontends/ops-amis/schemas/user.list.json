@@ -1,0 +1,42 @@
+{
+  "type": "page",
+  "title": "OPS Portal (AMis) - 用户管理",
+  "body": [
+    {
+      "type": "crud",
+      "api": {
+        "method": "get",
+        "url": "${apiBase}/api/users",
+        "data": {
+          "pageNo": "${page}",
+          "pageSize": "${perPage}",
+          "keyword": "${keyword}",
+          "menuId": "${__menuId}"
+        },
+        "adaptor": "if(payload.code!==0)return {status:payload.code,msg:payload.message}; return {status:0,data:{items:payload.data.items||[],total:payload.data.total||0}};"
+      },
+      "columns": [
+        {
+          "name": "username",
+          "label": "登录名"
+        },
+        {
+          "name": "realName",
+          "label": "姓名"
+        },
+        {
+          "name": "orgId",
+          "label": "组织"
+        },
+        {
+          "name": "status",
+          "label": "状态"
+        },
+        {
+          "name": "createdAt",
+          "label": "创建时间"
+        }
+      ]
+    }
+  ]
+}
