@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>AMis Platform Demo</title>
+  <link rel="stylesheet" href="https://unpkg.com/amis@6.7.0/sdk/sdk.css" />
+  <link rel="stylesheet" href="https://unpkg.com/amis@6.7.0/sdk/helper.css" />
+  <script src="https://unpkg.com/amis@6.7.0/sdk/sdk.js"></script>
+  <style>
+    body { margin:0; height:100vh; display:flex; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial; }
+    #sidebar { width: 240px; border-right: 1px solid #eee; padding: 12px; overflow:auto; }
+    #main { flex:1; padding: 12px; overflow:auto; }
+    .menu-item { padding: 8px 10px; cursor:pointer; border-radius: 6px; }
+    .menu-item:hover { background: #f6f6f6; }
+    .tabs { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+    .tab { padding:6px 10px; border:1px solid #ddd; border-radius: 999px; cursor:pointer; }
+    .tab.active { background:#111; color:#fff; border-color:#111; }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <div style="font-weight:600; margin-bottom:10px;">Demo 菜单</div>
+    <div id="menu"></div>
+    <div style="margin-top:12px; font-size:12px; color:#666;">
+      OpenAPI: <a href="/spec/openapi.yaml" target="_blank">/spec/openapi.yaml</a>
+    </div>
+  </div>
+  <div id="main">
+    <div class="tabs" id="tabs"></div>
+    <div id="amisRoot"></div>
+  </div>
+
+<script>
+  const amisRoot = document.getElementById('amisRoot');
+  const menuRoot = document.getElementById('menu');
+  const tabsRoot = document.getElementById('tabs');
+
+  async function getJSON(url) {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    return await r.json();
+  }
+
+  function evalWhen(expr, ctx) {
+    if (!expr) return true;
+    try {
+      const fn = new Function('ctx','data','row', `return (${expr});`);
+      return !!fn(ctx, ctx.data || {}, ctx.row || null);
+    } catch(e) {
+      console.warn('when eval failed:', expr, e);
+      return false;
+    }
+  }
+  function matchField(policyField, field) {
+    if (policyField === field) return 2;
+    if (policyField && policyField.endsWith('.*')) {
+      const prefix = policyField.slice(0, -2);
+      if (field.startsWith(prefix + '.')) return 1;
+    }
+    return 0;
+  }
+
+  function buildHelpers(envData) {
+    const ctx = {
+      me: envData.__me,
+      perms: envData.__perms || [],
+      menuId: envData.__menuId,
+      menuActions: envData.__menuActions || [],
+      defaultScope: envData.__defaultScope || {},
+      data: envData,
+      row: null
+    };
+
+    function FP_MODE(resource, field, target, row) {
+      ctx.row = row || null;
+      const list = (envData.__fieldPolicies || []).filter(p => p.resource===resource && p.target===target && matchField(p.field, field)>0);
+      if (!list.length) return 'VISIBLE';
+      const filtered = list.filter(p => evalWhen(p.when, ctx))
+        .sort((a,b)=> (b.priority||0)-(a.priority||0) || (matchField(b.field,field)-matchField(a.field,field)));
+      if (!filtered.length) return 'VISIBLE';
+      return filtered[0].mode || 'VISIBLE';
+    }
+    function FP_VISIBLE(resource, field, target, row){ return FP_MODE(resource,field,target,row)!=='HIDDEN'; }
+    function FP_READONLY(resource, field, target, row){ return FP_MODE(resource,field,target,row)==='READONLY'; }
+    function FP_MASK(resource, field, target, row){ return FP_MODE(resource,field,target,row)==='MASKED'; }
+
+    function AP_PICK(resource, actionKey, target, row) {
+      ctx.row = row || null;
+      const list = (envData.__actionPolicies || []).filter(p => p.resource===resource && p.actionKey===actionKey && p.target===target);
+      if (!list.length) return null;
+      const filtered = list.filter(p => evalWhen(p.when, ctx)).sort((a,b)=> (b.priority||0)-(a.priority||0));
+      return filtered[0] || null;
+    }
+    function AP_VISIBLE(resource, actionKey, target, row){ const p=AP_PICK(resource,actionKey,target,row); return !p || p.mode!=='HIDE'; }
+    function AP_DISABLED(resource, actionKey, target, row){ const p=AP_PICK(resource,actionKey,target,row); return !!p && p.mode==='DISABLE'; }
+    function AP_META(resource, actionKey, target, row){ return AP_PICK(resource,actionKey,target,row) || {}; }
+
+    function MASK(value, type) {
+      if (value == null) return value;
+      const s = String(value);
+      if (type === 'phone') return s.replace(/(\d{3})\d+(\d{2})/, '$1****$2');
+      if (type === 'email') return s.replace(/(.{2}).+(@.+)/, '$1****$2');
+      if (type === 'amount') return '****';
+      return '****';
+    }
+
+    return {FP_VISIBLE,FP_READONLY,FP_MASK,AP_VISIBLE,AP_DISABLED,AP_META,MASK};
+  }
+
+  const amisEnv = {
+    fetcher: async (api) => {
+      const method = (api.method || 'get').toUpperCase();
+      const url = api.url;
+      const headers = {'Content-Type': 'application/json'};
+      const body = api.data && method!=='GET' ? JSON.stringify(api.data) : undefined;
+      const res = await fetch(url, {method, headers, body});
+      const data = await res.json();
+      return { ok: true, status: res.status, data };
+    }
+  };
+
+  let __me=null, __perms=[], __defaultScope={};
+  const tabs=[];
+  let activeTab=null;
+
+  function renderTabs(){
+    tabsRoot.innerHTML='';
+    tabs.forEach(t=>{
+      const el=document.createElement('div');
+      el.className='tab'+(t.key===activeTab?' active':'');
+      el.textContent=t.title;
+      el.onclick=()=>openTab(t);
+      tabsRoot.appendChild(el);
+    });
+  }
+
+  async function openTab(tab){
+    activeTab=tab.key; renderTabs();
+
+    let menuActions=[], fieldPolicies=[], actionPolicies=[];
+    try {
+      const a = await getJSON(`/api/menus/${tab.menuId}/actions`);
+      menuActions = (a.data||[]).filter(x=>x.enabled).map(x=>x.key);
+    } catch(e){ console.warn(e); }
+    try {
+      const fp = await getJSON(`/api/menus/${tab.menuId}/field-policies`);
+      fieldPolicies = fp.data || [];
+    } catch(e){ console.warn(e); }
+    try {
+      const ap = await getJSON(`/api/menus/${tab.menuId}/action-policies`);
+      actionPolicies = ap.data || [];
+    } catch(e){ console.warn(e); }
+
+    const schema = await getJSON(tab.schemaRef);
+    const data = {
+      __me, __perms, __defaultScope,
+      __menuId: tab.menuId,
+      __menuActions: menuActions,
+      __fieldPolicies: fieldPolicies,
+      __actionPolicies: actionPolicies
+    };
+    const helpers = buildHelpers(data);
+    const env = Object.assign({}, amisEnv, helpers);
+    amis.embed(amisRoot, schema, data, env);
+  }
+
+  async function init(){
+    const meRes = await getJSON('/api/auth/me');
+    __me=meRes.data; __perms=meRes.data.permissions||[]; __defaultScope=meRes.data.defaultScope||{};
+
+    let menus=[];
+    try {
+      const treeRes = await getJSON('/api/menus/tree?scene=SIDEBAR');
+      menus = treeRes.data || [];
+    } catch(e){ console.warn('menus api failed, fallback', e); }
+
+    if(!menus.length){
+      const nav = await getJSON('/schemas/_system/menu.json');
+      menus = (nav.links||[]).map((x,i)=>({id:String(i+1), title:x.label, type:'MENU', path:x.to, schemaRef:guessSchemaRef(x.to)}));
+    }
+
+    menuRoot.innerHTML='';
+    menus.forEach(m=>{
+      const el=document.createElement('div');
+      el.className='menu-item';
+      el.textContent=m.title;
+      el.onclick=()=>{
+        const t={key:m.path,title:m.title,schemaRef:m.schemaRef,menuId:m.id};
+        const existed=tabs.find(x=>x.key===t.key);
+        if(!existed) tabs.push(t);
+        openTab(existed||t); renderTabs();
+      };
+      menuRoot.appendChild(el);
+    });
+
+    if(menus[0]){
+      const t={key:menus[0].path,title:menus[0].title,schemaRef:menus[0].schemaRef,menuId:menus[0].id};
+      tabs.push(t); openTab(t); renderTabs();
+    }
+  }
+
+  function guessSchemaRef(path){
+    if(path==='/admin/users') return '/schemas/user/list.json';
+    if(path==='/sys/roles') return '/schemas/rbac/role-list.json';
+    if(path==='/sys/menus') return '/schemas/menu/list.json';
+    if(path==='/flow/approvals') return '/schemas/approval/list.json';
+    return '/schemas/user/list.json';
+  }
+
+  init().catch(e=>{ amisRoot.innerHTML='<pre style="color:red">'+String(e.stack||e)+'</pre>'; });
+</script>
+</body>
+</html>
