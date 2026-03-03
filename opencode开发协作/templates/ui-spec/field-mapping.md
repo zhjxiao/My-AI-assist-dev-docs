@@ -1,3 +1,1 @@
-# Field Mapping
-
-Map OpenAPI types to AMis controls.
+# 字段映射规则

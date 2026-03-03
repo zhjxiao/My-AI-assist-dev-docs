@@ -1,2 +1,7 @@
-# Enhanced OpenAPI with x-permission/x-ui/x-dict/x-mask/x-audit
-# (See documentation for full specification usage)
+openapi: 3.0.3
+info:
+  title: Enterprise Platform API
+  version: 1.0.0
+paths: {}
+components:
+  schemas: {}

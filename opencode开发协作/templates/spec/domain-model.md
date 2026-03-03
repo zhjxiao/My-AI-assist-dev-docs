@@ -1,3 +1,3 @@
-# Domain Model Definitions
+# 领域模型定义
 
-Define field meanings, enums, and labels here.
+包含用户、角色、菜单、审批等模型说明。

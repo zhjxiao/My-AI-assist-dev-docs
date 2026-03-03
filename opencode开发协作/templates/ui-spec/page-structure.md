@@ -1,3 +1,1 @@
-# Page Structure
-
-Standard list page and form layout rules.
+# 页面结构规范

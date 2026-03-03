@@ -1,3 +1,1 @@
-# Custom Renderer Protocol
-
-org-selector, group-selector, dict-select, user-picker specs.
+# 自研组件协议

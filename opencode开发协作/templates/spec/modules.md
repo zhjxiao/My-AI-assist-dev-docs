@@ -1,3 +1,1 @@
-# Module List
-
-Define modules for batch schema generation.
+# 模块清单（自动生成）

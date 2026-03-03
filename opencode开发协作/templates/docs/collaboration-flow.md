@@ -1,5 +1,1 @@
-# Collaboration Flow
-
-UI -> Design Tokens -> OpenAPI Contract ->
-AI Generate Schema & Backend DTO ->
-Manual Review -> CI Validation
+# 前后端 + UI + AI 协作流程
