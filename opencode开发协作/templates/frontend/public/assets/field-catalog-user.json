@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "label": "username - 登录名",
+    "value": "username"
+  },
+  {
+    "label": "realName - 姓名",
+    "value": "realName"
+  },
+  {
+    "label": "phone - 手机号",
+    "value": "phone"
+  },
+  {
+    "label": "orgId - 组织",
+    "value": "orgId"
+  },
+  {
+    "label": "status - 状态",
+    "value": "status"
+  }
+]

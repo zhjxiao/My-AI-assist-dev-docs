@@ -1,1 +1,33 @@
-{}
+{
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/menus/${id}/permissions"
+  },
+  "body": [
+    {
+      "type": "form",
+      "wrapWithPanel": false,
+      "body": [
+        {
+          "type": "transfer",
+          "name": "permissions",
+          "label": "需要具备的权限点（满足即显示）",
+          "searchable": true,
+          "source": {
+            "method": "get",
+            "url": "/assets/permissions-tree.json"
+          },
+          "value": "${data}"
+        }
+      ],
+      "api": {
+        "method": "put",
+        "url": "/api/menus/${id}/permissions",
+        "data": {
+          "permissions": "${permissions}"
+        }
+      }
+    }
+  ]
+}

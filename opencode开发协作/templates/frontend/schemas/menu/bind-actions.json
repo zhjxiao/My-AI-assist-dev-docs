@@ -1,4 +1,48 @@
 {
-  "type": "form",
-  "body": []
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/menus/${id}/actions",
+    "adaptor": "if(!payload)return {status:500,msg:'EMPTY'}; if(payload.code!==0)return {status:payload.code||500,msg:payload.message||'ERROR'}; return {status:0,data:{actions:(payload.data||[])}};"
+  },
+  "body": [
+    {
+      "type": "form",
+      "wrapWithPanel": false,
+      "body": [
+        {
+          "type": "input-table",
+          "name": "actions",
+          "label": "菜单动作",
+          "addable": false,
+          "editable": true,
+          "removable": false,
+          "columns": [
+            {
+              "name": "title",
+              "label": "动作名称",
+              "type": "static"
+            },
+            {
+              "name": "key",
+              "label": "Key",
+              "type": "static"
+            },
+            {
+              "name": "enabled",
+              "label": "启用",
+              "type": "switch"
+            }
+          ]
+        }
+      ],
+      "api": {
+        "method": "put",
+        "url": "/api/menus/${id}/actions",
+        "data": {
+          "actions": "${actions}"
+        }
+      }
+    }
+  ]
 }

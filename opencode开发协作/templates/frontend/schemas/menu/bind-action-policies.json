@@ -1,4 +1,110 @@
 {
-  "type": "form",
-  "body": []
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/menus/${id}/action-policies",
+    "adaptor": "if(!payload)return {status:500,msg:'EMPTY'}; if(payload.code!==0)return {status:payload.code||500,msg:payload.message||'ERROR'}; return {status:0,data:{policies:payload.data||[]}};"
+  },
+  "body": [
+    {
+      "type": "form",
+      "wrapWithPanel": false,
+      "body": [
+        {
+          "type": "input-table",
+          "name": "policies",
+          "label": "动作条件策略(支持when)",
+          "addable": true,
+          "editable": true,
+          "removable": true,
+          "columns": [
+            {
+              "name": "resource",
+              "label": "资源",
+              "type": "input-text",
+              "placeholder": "user/approval"
+            },
+            {
+              "name": "actionKey",
+              "label": "动作Key",
+              "type": "input-text",
+              "placeholder": "user:delete"
+            },
+            {
+              "name": "target",
+              "label": "位置",
+              "type": "select",
+              "options": [
+                {
+                  "label": "工具栏",
+                  "value": "TOOLBAR"
+                },
+                {
+                  "label": "行按钮",
+                  "value": "ROW"
+                },
+                {
+                  "label": "详情页",
+                  "value": "DETAIL"
+                }
+              ]
+            },
+            {
+              "name": "mode",
+              "label": "模式",
+              "type": "select",
+              "options": [
+                {
+                  "label": "允许",
+                  "value": "ALLOW"
+                },
+                {
+                  "label": "隐藏",
+                  "value": "HIDE"
+                },
+                {
+                  "label": "禁用",
+                  "value": "DISABLE"
+                }
+              ]
+            },
+            {
+              "name": "when",
+              "label": "条件(when)",
+              "type": "textarea",
+              "placeholder": "row.status!='DISABLED' 或 data.status=='DRAFT'"
+            },
+            {
+              "name": "priority",
+              "label": "优先级",
+              "type": "input-number"
+            },
+            {
+              "name": "disabledReason",
+              "label": "禁用原因",
+              "type": "input-text",
+              "visibleOn": "this.mode==='DISABLE'"
+            },
+            {
+              "name": "confirmText",
+              "label": "确认文案",
+              "type": "textarea"
+            },
+            {
+              "name": "requireReason",
+              "label": "需要原因",
+              "type": "switch"
+            }
+          ]
+        }
+      ],
+      "api": {
+        "method": "put",
+        "url": "/api/menus/${id}/action-policies",
+        "data": {
+          "policies": "${policies}"
+        }
+      }
+    }
+  ]
 }

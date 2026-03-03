@@ -1,1 +1,57 @@
-{ "type": "container", "body": "Data Scope Filter Snippet" }
+{
+  "type": "container",
+  "visibleOn": "this.__perms && this.__perms.indexOf('data:scope')>=0",
+  "body": [
+    {
+      "type": "divider"
+    },
+    {
+      "type": "form",
+      "mode": "inline",
+      "wrapWithPanel": false,
+      "target": "${__target}",
+      "body": [
+        {
+          "type": "select",
+          "name": "dataScope.scopeType",
+          "label": "数据范围",
+          "value": "ORG_AND_CHILD",
+          "options": [
+            {
+              "label": "本人",
+              "value": "SELF"
+            },
+            {
+              "label": "本组织",
+              "value": "ORG"
+            },
+            {
+              "label": "本组织及下级",
+              "value": "ORG_AND_CHILD"
+            },
+            {
+              "label": "用户组",
+              "value": "GROUP"
+            },
+            {
+              "label": "全部",
+              "value": "ALL"
+            }
+          ]
+        },
+        {
+          "type": "org-selector",
+          "name": "dataScope.orgId",
+          "label": "组织",
+          "visibleOn": "this.dataScope && (this.dataScope.scopeType==='ORG' || this.dataScope.scopeType==='ORG_AND_CHILD')"
+        },
+        {
+          "type": "group-selector",
+          "name": "dataScope.groupId",
+          "label": "用户组",
+          "visibleOn": "this.dataScope && this.dataScope.scopeType==='GROUP'"
+        }
+      ]
+    }
+  ]
+}

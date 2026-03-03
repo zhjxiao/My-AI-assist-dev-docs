@@ -1,8 +1,629 @@
-
 openapi: 3.0.3
 info:
-  title: Enterprise AMis Platform API
-  version: 1.0.0
-paths: {}
+  title: AMis Platform API (Sample)
+  version: 0.1.0
+servers:
+  - url: /api
+
+tags:
+  - name: Menu
+    description: Menu management
+    x-menu:
+      title: 菜单管理
+      icon: "sitemap"
+      path: "/sys/menus"
+      schemaRef: "/schemas/menu/list.json"
+      order: 10
+
+  - name: Role
+    description: Role & permissions
+    x-menu:
+      title: 角色权限
+      icon: "lock"
+      path: "/sys/roles"
+      schemaRef: "/schemas/rbac/role-list.json"
+      order: 20
+
+paths:
+  /menus/tree:
+    get:
+      tags: [Menu]
+      summary: Get menu tree
+      x-permission: "menu:tree"
+      parameters:
+        - in: query
+          name: scene
+          schema: { type: string, enum: [SIDEBAR, ADMIN] }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_MenuNodeArray" }
+
+  /menus:
+    get:
+      tags: [Menu]
+      summary: Query menus (paged)
+      x-permission: "menu:query"
+      parameters:
+        - in: query
+          name: pageNo
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, maximum: 200, default: 20 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_PageResult_Menu" }
+    post:
+      tags: [Menu]
+      summary: Create menu
+      x-permission: "menu:create"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MenuCreateRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Menu" }
+
+  /menus/{id}:
+    get:
+      tags: [Menu]
+      summary: Menu detail
+      x-permission: "menu:detail"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Menu" }
+    put:
+      tags: [Menu]
+      summary: Update menu
+      x-permission: "menu:update"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MenuUpdateRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Menu" }
+    delete:
+      tags: [Menu]
+      summary: Delete menu
+      x-permission: "menu:delete"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Void" }
+
+  /menus/{id}/permissions:
+    get:
+      tags: [Menu]
+      summary: Get menu required permissions
+      x-permission: "menu:perm:read"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_StringArray" }
+    put:
+      tags: [Menu]
+      summary: Update menu required permissions
+      x-permission: "menu:perm:write"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MenuPermissionsUpdateRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Void" }
+
+  /menus/{id}/actions:
+    get:
+      tags: [Menu]
+      summary: Get enabled actions for a menu
+      x-permission: "menu:action:read"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_MenuActionArray" }
+    put:
+      tags: [Menu]
+      summary: Update enabled actions for a menu
+      x-permission: "menu:action:write"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MenuActionsUpdateRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Void" }
+
+  /menus/{id}/field-policies:
+    get:
+      tags: [Menu]
+      summary: Get field policies for a menu
+      x-permission: "menu:field:read"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_FieldPolicyArray" }
+    put:
+      tags: [Menu]
+      summary: Update field policies for a menu
+      x-permission: "menu:field:write"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FieldPoliciesUpdateRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Void" }
+
+  /menus/{id}/action-policies:
+    get:
+      tags: [Menu]
+      summary: Get action policies for a menu
+      x-permission: "menu:actionPolicy:read"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_ActionPolicyArray" }
+    put:
+      tags: [Menu]
+      summary: Update action policies for a menu
+      x-permission: "menu:actionPolicy:write"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ActionPoliciesUpdateRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Void" }
+
+  /roles:
+    get:
+      tags: [Role]
+      summary: Query roles
+      x-permission: "role:query"
+      parameters:
+        - in: query
+          name: pageNo
+          schema: { type: integer, minimum: 1, default: 1 }
+        - in: query
+          name: pageSize
+          schema: { type: integer, minimum: 1, maximum: 200, default: 20 }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_PageResult_Role" }
+
+  /roles/{id}/permissions:
+    get:
+      tags: [Role]
+      summary: Get role permissions
+      x-permission: "role:perm:read"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_StringArray" }
+    put:
+      tags: [Role]
+      summary: Update role permissions
+      x-permission: "role:perm:write"
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/RolePermissionsUpdateRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ApiResponse_Void" }
+
 components:
-  schemas: {}
+  schemas:
+    ApiResponseBase:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: integer }
+        message: { type: string }
+        traceId: { type: string, nullable: true }
+
+    ApiResponse_Void:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { nullable: true }
+
+    ApiResponse_StringArray:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data:
+              type: array
+              items: { type: string }
+
+    PageResultBase:
+      type: object
+      required: [items, total]
+      properties:
+        items: { type: array, items: {} }
+        total: { type: integer }
+
+    # Menu
+    MenuType:
+      type: string
+      enum: [MENU, LINK, BUTTON]
+
+    MenuNode:
+      type: object
+      required: [id, title, type]
+      properties:
+        id: { type: string }
+        parentId: { type: string, nullable: true }
+        title: { type: string }
+        type: { $ref: "#/components/schemas/MenuType" }
+        path: { type: string, nullable: true }
+        schemaRef: { type: string, nullable: true }
+        icon: { type: string, nullable: true }
+        orderNo: { type: integer, nullable: true }
+        visible: { type: boolean, nullable: true }
+        children:
+          type: array
+          items: { $ref: "#/components/schemas/MenuNode" }
+
+    MenuNodeArray:
+      type: array
+      items: { $ref: "#/components/schemas/MenuNode" }
+
+    Menu:
+      allOf:
+        - $ref: "#/components/schemas/MenuNode"
+        - type: object
+          properties:
+            createdAt: { type: string, format: date-time, nullable: true }
+
+    MenuCreateRequest:
+      type: object
+      required: [title, type]
+      properties:
+        parentId: { type: string, nullable: true }
+        title: { type: string }
+        type: { $ref: "#/components/schemas/MenuType" }
+        path: { type: string, nullable: true }
+        schemaRef: { type: string, nullable: true }
+        icon: { type: string, nullable: true }
+        orderNo: { type: integer, nullable: true }
+        visible: { type: boolean, nullable: true }
+
+    MenuUpdateRequest:
+      allOf: [ { $ref: "#/components/schemas/MenuCreateRequest" } ]
+
+    PageResult_Menu:
+      allOf:
+        - $ref: "#/components/schemas/PageResultBase"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Menu" }
+
+    ApiResponse_Menu:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/Menu" }
+
+    ApiResponse_PageResult_Menu:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/PageResult_Menu" }
+
+    ApiResponse_MenuNodeArray:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/MenuNodeArray" }
+
+    MenuPermissionsUpdateRequest:
+      type: object
+      required: [permissions]
+      properties:
+        permissions:
+          type: array
+          items: { type: string }
+
+    # Menu actions
+    MenuAction:
+      type: object
+      required: [key, title, enabled]
+      properties:
+        key: { type: string }
+        title: { type: string }
+        enabled: { type: boolean }
+
+    MenuActionArray:
+      type: array
+      items: { $ref: "#/components/schemas/MenuAction" }
+
+    MenuActionsUpdateRequest:
+      type: object
+      required: [actions]
+      properties:
+        actions:
+          type: array
+          items:
+            type: object
+            required: [key, enabled]
+            properties:
+              key: { type: string }
+              enabled: { type: boolean }
+
+    ApiResponse_MenuActionArray:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/MenuActionArray" }
+
+    # Data scope policy
+    DataScopeType:
+      type: string
+      enum: [INHERIT, SELF, ORG, ORG_AND_CHILD, GROUP, ALL]
+
+    DataScopePolicy:
+      type: object
+      required: [scopeType]
+      properties:
+        scopeType: { $ref: "#/components/schemas/DataScopeType" }
+        orgId: { type: string, nullable: true }
+        groupId: { type: string, nullable: true }
+        remark: { type: string, nullable: true }
+
+    ApiResponse_DataScopePolicy:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/DataScopePolicy" }
+
+    # Field policies (with when)
+    FieldPolicyTarget:
+      type: string
+      enum: [LIST, DETAIL, FORM]
+
+    FieldPolicyMode:
+      type: string
+      enum: [VISIBLE, HIDDEN, READONLY, MASKED]
+
+    MaskType:
+      type: string
+      enum: [phone, idCard, email, name, amount, custom]
+
+    FieldPolicy:
+      type: object
+      required: [resource, field, target, mode]
+      properties:
+        resource: { type: string }
+        field: { type: string }
+        target: { $ref: "#/components/schemas/FieldPolicyTarget" }
+        mode: { $ref: "#/components/schemas/FieldPolicyMode" }
+        when: { type: string, nullable: true }
+        priority: { type: integer, nullable: true }
+        maskType: { $ref: "#/components/schemas/MaskType", nullable: true }
+        maskRule: { type: string, nullable: true }
+        unmaskPermission: { type: string, nullable: true }
+        remark: { type: string, nullable: true }
+
+    FieldPolicyArray:
+      type: array
+      items: { $ref: "#/components/schemas/FieldPolicy" }
+
+    FieldPoliciesUpdateRequest:
+      type: object
+      required: [policies]
+      properties:
+        policies:
+          type: array
+          items: { $ref: "#/components/schemas/FieldPolicy" }
+
+    ApiResponse_FieldPolicyArray:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/FieldPolicyArray" }
+
+    # Action policies (with when)
+    ActionPolicyTarget:
+      type: string
+      enum: [TOOLBAR, ROW, DETAIL]
+
+    ActionPolicyMode:
+      type: string
+      enum: [ALLOW, HIDE, DISABLE]
+
+    ActionPolicy:
+      type: object
+      required: [resource, actionKey, target, mode]
+      properties:
+        resource: { type: string }
+        actionKey: { type: string }
+        target: { $ref: "#/components/schemas/ActionPolicyTarget" }
+        mode: { $ref: "#/components/schemas/ActionPolicyMode" }
+        when: { type: string, nullable: true }
+        priority: { type: integer, nullable: true }
+        disabledReason: { type: string, nullable: true }
+        confirmText: { type: string, nullable: true }
+        requireReason: { type: boolean, nullable: true }
+
+    ActionPolicyArray:
+      type: array
+      items: { $ref: "#/components/schemas/ActionPolicy" }
+
+    ActionPoliciesUpdateRequest:
+      type: object
+      required: [policies]
+      properties:
+        policies:
+          type: array
+          items: { $ref: "#/components/schemas/ActionPolicy" }
+
+    ApiResponse_ActionPolicyArray:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/ActionPolicyArray" }
+
+    # Role
+    Role:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        code: { type: string, nullable: true }
+        remark: { type: string, nullable: true }
+
+    PageResult_Role:
+      allOf:
+        - $ref: "#/components/schemas/PageResultBase"
+        - type: object
+          properties:
+            items:
+              type: array
+              items: { $ref: "#/components/schemas/Role" }
+
+    ApiResponse_PageResult_Role:
+      allOf:
+        - $ref: "#/components/schemas/ApiResponseBase"
+        - type: object
+          properties:
+            data: { $ref: "#/components/schemas/PageResult_Role" }
+
+    RolePermissionsUpdateRequest:
+      type: object
+      required: [permissions]
+      properties:
+        permissions:
+          type: array
+          items: { type: string }

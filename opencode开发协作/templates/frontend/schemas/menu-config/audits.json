@@ -1,0 +1,73 @@
+{
+  "type": "page",
+  "title": "配置审计日志",
+  "data": {
+    "__perms": "${__perms}"
+  },
+  "body": [
+    {
+      "type": "crud",
+      "name": "auditCrud",
+      "syncLocation": false,
+      "api": {
+        "method": "get",
+        "url": "/api/menus/${menuId}/config/audits",
+        "data": {
+          "pageNo": "${page}",
+          "pageSize": "${perPage}"
+        },
+        "adaptor": "if(!payload)return {status:500,msg:'EMPTY'}; if(payload.code!==0)return {status:payload.code||500,msg:payload.message||'ERROR'}; return {status:0,data:{items:payload.data.items||[],total:payload.data.total||0}};"
+      },
+      "pageField": "page",
+      "perPageField": "perPage",
+      "perPage": 20,
+      "columns": [
+        {
+          "name": "at",
+          "label": "时间",
+          "type": "date",
+          "format": "YYYY-MM-DD HH:mm:ss"
+        },
+        {
+          "name": "by",
+          "label": "操作者"
+        },
+        {
+          "name": "action",
+          "label": "动作"
+        },
+        {
+          "name": "versionId",
+          "label": "版本"
+        },
+        {
+          "name": "note",
+          "label": "说明"
+        },
+        {
+          "name": "traceId",
+          "label": "TraceId"
+        },
+        {
+          "type": "operation",
+          "label": "详情",
+          "buttons": [
+            {
+              "type": "button",
+              "label": "查看 Diff",
+              "actionType": "drawer",
+              "drawer": {
+                "title": "Diff",
+                "size": "xl",
+                "body": {
+                  "type": "json",
+                  "source": "${diff}"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

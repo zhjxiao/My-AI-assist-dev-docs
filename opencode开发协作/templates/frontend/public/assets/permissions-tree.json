@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "label": "User",
+    "value": "user",
+    "children": [
+      {
+        "label": "user:query",
+        "value": "user:query"
+      },
+      {
+        "label": "user:create",
+        "value": "user:create"
+      }
+    ]
+  },
+  {
+    "label": "Menu",
+    "value": "menu",
+    "children": [
+      {
+        "label": "menu:query",
+        "value": "menu:query"
+      },
+      {
+        "label": "menu:create",
+        "value": "menu:create"
+      }
+    ]
+  }
+]

@@ -1,4 +1,16 @@
 {
   "type": "nav",
-  "links": []
+  "stacked": true,
+  "links": [
+    {
+      "label": "菜单管理",
+      "to": "/sys/menus",
+      "icon": "fa fa-sitemap"
+    },
+    {
+      "label": "角色权限",
+      "to": "/sys/roles",
+      "icon": "fa fa-lock"
+    }
+  ]
 }

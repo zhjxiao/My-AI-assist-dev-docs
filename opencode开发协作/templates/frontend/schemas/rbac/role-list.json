@@ -1,4 +1,162 @@
 {
   "type": "page",
-  "title": "Role Management"
+  "title": "角色管理",
+  "data": {
+    "__perms": "${__perms}"
+  },
+  "body": [
+    {
+      "type": "crud",
+      "name": "roleCrud",
+      "syncLocation": false,
+      "api": {
+        "method": "get",
+        "url": "/api/roles",
+        "data": {
+          "pageNo": "${page}",
+          "pageSize": "${perPage}",
+          "keyword": "${keyword}"
+        },
+        "adaptor": "if(!payload)return {status:500,msg:'EMPTY'}; if(payload.code!==0)return {status:payload.code||500,msg:payload.message||'ERROR'}; return {status:0,data:{items:payload.data.items||[],total:payload.data.total||0}};"
+      },
+      "pageField": "page",
+      "perPageField": "perPage",
+      "perPage": 20,
+      "headerToolbar": [
+        {
+          "type": "input-text",
+          "name": "keyword",
+          "placeholder": "搜索角色名称/编码",
+          "clearable": true,
+          "addOn": {
+            "type": "submit",
+            "label": "搜索",
+            "level": "primary"
+          }
+        },
+        {
+          "type": "button",
+          "label": "新增角色",
+          "level": "primary",
+          "visibleOn": "this.__perms && this.__perms.indexOf('role:create')>=0",
+          "actionType": "dialog",
+          "dialog": {
+            "title": "新增角色",
+            "size": "lg",
+            "body": {
+              "type": "form",
+              "api": {
+                "method": "post",
+                "url": "/api/roles"
+              },
+              "body": [
+                {
+                  "type": "input-text",
+                  "name": "name",
+                  "label": "角色名称",
+                  "required": true
+                },
+                {
+                  "type": "input-text",
+                  "name": "code",
+                  "label": "角色编码"
+                },
+                {
+                  "type": "textarea",
+                  "name": "remark",
+                  "label": "备注"
+                }
+              ]
+            }
+          }
+        },
+        "pagination"
+      ],
+      "columns": [
+        {
+          "name": "name",
+          "label": "角色名称"
+        },
+        {
+          "name": "code",
+          "label": "角色编码"
+        },
+        {
+          "name": "remark",
+          "label": "备注"
+        },
+        {
+          "type": "operation",
+          "label": "操作",
+          "buttons": [
+            {
+              "type": "button",
+              "label": "授权",
+              "level": "primary",
+              "visibleOn": "this.__perms && this.__perms.indexOf('role:perm:write')>=0",
+              "actionType": "drawer",
+              "drawer": {
+                "title": "角色授权",
+                "size": "lg",
+                "body": {
+                  "$ref": "/schemas/rbac/role-permissions.json"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "编辑",
+              "visibleOn": "this.__perms && this.__perms.indexOf('role:update')>=0",
+              "actionType": "dialog",
+              "dialog": {
+                "title": "编辑角色",
+                "size": "lg",
+                "body": {
+                  "type": "form",
+                  "initApi": {
+                    "method": "get",
+                    "url": "/api/roles/${id}"
+                  },
+                  "api": {
+                    "method": "put",
+                    "url": "/api/roles/${id}"
+                  },
+                  "body": [
+                    {
+                      "type": "input-text",
+                      "name": "name",
+                      "label": "角色名称",
+                      "required": true
+                    },
+                    {
+                      "type": "input-text",
+                      "name": "code",
+                      "label": "角色编码"
+                    },
+                    {
+                      "type": "textarea",
+                      "name": "remark",
+                      "label": "备注"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "删除",
+              "level": "danger",
+              "visibleOn": "this.__perms && this.__perms.indexOf('role:delete')>=0",
+              "actionType": "ajax",
+              "confirmText": "确定删除该角色？",
+              "api": {
+                "method": "delete",
+                "url": "/api/roles/${id}"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

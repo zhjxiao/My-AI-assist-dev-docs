@@ -1,1 +1,7 @@
-{ "type": "alert", "body": "Scope Hint" }
+{
+  "type": "alert",
+  "level": "warning",
+  "showIcon": true,
+  "visibleOn": "this.__scopeHint",
+  "body": "当前数据范围：${__scopeHint}"
+}

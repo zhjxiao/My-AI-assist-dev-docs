@@ -1,1 +1,70 @@
-[]
+[
+  {
+    "type": "tree-select",
+    "name": "parentId",
+    "label": "父级菜单",
+    "clearable": true,
+    "source": {
+      "method": "get",
+      "url": "/api/menus/tree?scene=ADMIN",
+      "adaptor": "if(payload.code!==0)return {status:payload.code,msg:payload.message}; return {status:0,data:{options:payload.data||[]}};"
+    },
+    "labelField": "title",
+    "valueField": "id"
+  },
+  {
+    "type": "input-text",
+    "name": "title",
+    "label": "名称",
+    "required": true
+  },
+  {
+    "type": "select",
+    "name": "type",
+    "label": "类型",
+    "required": true,
+    "options": [
+      {
+        "label": "菜单",
+        "value": "MENU"
+      },
+      {
+        "label": "外链",
+        "value": "LINK"
+      },
+      {
+        "label": "按钮",
+        "value": "BUTTON"
+      }
+    ]
+  },
+  {
+    "type": "input-text",
+    "name": "path",
+    "label": "路径",
+    "visibleOn": "this.type==='MENU' || this.type==='LINK'"
+  },
+  {
+    "type": "input-text",
+    "name": "schemaRef",
+    "label": "SchemaRef",
+    "placeholder": "/schemas/xxx/list.json",
+    "visibleOn": "this.type==='MENU'"
+  },
+  {
+    "type": "input-text",
+    "name": "icon",
+    "label": "图标"
+  },
+  {
+    "type": "input-number",
+    "name": "orderNo",
+    "label": "排序"
+  },
+  {
+    "type": "switch",
+    "name": "visible",
+    "label": "显示",
+    "value": true
+  }
+]

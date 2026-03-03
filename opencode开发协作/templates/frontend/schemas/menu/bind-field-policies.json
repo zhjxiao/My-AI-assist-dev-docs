@@ -1,4 +1,133 @@
 {
-  "type": "form",
-  "body": []
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/menus/${id}/field-policies",
+    "adaptor": "if(!payload)return {status:500,msg:'EMPTY'}; if(payload.code!==0)return {status:payload.code||500,msg:payload.message||'ERROR'}; return {status:0,data:{policies:payload.data||[]}};"
+  },
+  "body": [
+    {
+      "type": "form",
+      "wrapWithPanel": false,
+      "body": [
+        {
+          "type": "input-table",
+          "name": "policies",
+          "label": "字段策略(支持when)",
+          "addable": true,
+          "editable": true,
+          "removable": true,
+          "columns": [
+            {
+              "name": "resource",
+              "label": "资源",
+              "type": "input-text",
+              "placeholder": "user/approval"
+            },
+            {
+              "name": "target",
+              "label": "位置",
+              "type": "select",
+              "options": [
+                {
+                  "label": "列表",
+                  "value": "LIST"
+                },
+                {
+                  "label": "详情",
+                  "value": "DETAIL"
+                },
+                {
+                  "label": "表单",
+                  "value": "FORM"
+                }
+              ]
+            },
+            {
+              "name": "field",
+              "label": "字段",
+              "type": "input-text",
+              "placeholder": "phone / formData.amount / formData.*"
+            },
+            {
+              "name": "mode",
+              "label": "模式",
+              "type": "select",
+              "options": [
+                {
+                  "label": "显示",
+                  "value": "VISIBLE"
+                },
+                {
+                  "label": "隐藏",
+                  "value": "HIDDEN"
+                },
+                {
+                  "label": "只读",
+                  "value": "READONLY"
+                },
+                {
+                  "label": "脱敏",
+                  "value": "MASKED"
+                }
+              ]
+            },
+            {
+              "name": "when",
+              "label": "条件(when)",
+              "type": "textarea",
+              "placeholder": "data.status=='APPROVING' 或 ctx.me.id==data.applicantId"
+            },
+            {
+              "name": "priority",
+              "label": "优先级",
+              "type": "input-number"
+            },
+            {
+              "name": "maskType",
+              "label": "脱敏类型",
+              "type": "select",
+              "visibleOn": "this.mode==='MASKED'",
+              "options": [
+                {
+                  "label": "phone",
+                  "value": "phone"
+                },
+                {
+                  "label": "idCard",
+                  "value": "idCard"
+                },
+                {
+                  "label": "email",
+                  "value": "email"
+                },
+                {
+                  "label": "amount",
+                  "value": "amount"
+                },
+                {
+                  "label": "custom",
+                  "value": "custom"
+                }
+              ]
+            },
+            {
+              "name": "unmaskPermission",
+              "label": "查看原值权限",
+              "type": "input-text",
+              "visibleOn": "this.mode==='MASKED'",
+              "placeholder": "mask:unmask"
+            }
+          ]
+        }
+      ],
+      "api": {
+        "method": "put",
+        "url": "/api/menus/${id}/field-policies",
+        "data": {
+          "policies": "${policies}"
+        }
+      }
+    }
+  ]
 }

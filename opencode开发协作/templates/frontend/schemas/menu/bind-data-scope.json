@@ -1,1 +1,68 @@
-{}
+{
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/menus/${id}/data-scope-policy"
+  },
+  "body": [
+    {
+      "type": "form",
+      "wrapWithPanel": false,
+      "body": [
+        {
+          "type": "select",
+          "name": "scopeType",
+          "label": "策略",
+          "required": true,
+          "options": [
+            {
+              "label": "继承用户默认",
+              "value": "INHERIT"
+            },
+            {
+              "label": "本人",
+              "value": "SELF"
+            },
+            {
+              "label": "本组织",
+              "value": "ORG"
+            },
+            {
+              "label": "本组织及下级",
+              "value": "ORG_AND_CHILD"
+            },
+            {
+              "label": "用户组",
+              "value": "GROUP"
+            },
+            {
+              "label": "全部",
+              "value": "ALL"
+            }
+          ]
+        },
+        {
+          "type": "org-selector",
+          "name": "orgId",
+          "label": "组织",
+          "visibleOn": "this.scopeType==='ORG' || this.scopeType==='ORG_AND_CHILD'"
+        },
+        {
+          "type": "group-selector",
+          "name": "groupId",
+          "label": "用户组",
+          "visibleOn": "this.scopeType==='GROUP'"
+        },
+        {
+          "type": "textarea",
+          "name": "remark",
+          "label": "备注"
+        }
+      ],
+      "api": {
+        "method": "put",
+        "url": "/api/menus/${id}/data-scope-policy"
+      }
+    }
+  ]
+}

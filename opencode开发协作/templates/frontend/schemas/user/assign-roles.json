@@ -1,4 +1,39 @@
 {
-  "type": "form",
-  "body": []
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/users/${id}/roles"
+  },
+  "body": [
+    {
+      "type": "form",
+      "wrapWithPanel": false,
+      "body": [
+        {
+          "type": "select",
+          "name": "roleIds",
+          "label": "角色",
+          "multiple": true,
+          "searchable": true,
+          "source": {
+            "method": "get",
+            "url": "/api/roles",
+            "data": {
+              "pageNo": 1,
+              "pageSize": 200
+            },
+            "adaptor": "if(payload.code!==0)return {status:payload.code,msg:payload.message}; return {status:0,data:{options:(payload.data.items||[]).map(x=>({label:x.name,value:x.id}))}};"
+          },
+          "value": "${data}"
+        }
+      ],
+      "api": {
+        "method": "put",
+        "url": "/api/users/${id}/roles",
+        "data": {
+          "roleIds": "${roleIds}"
+        }
+      }
+    }
+  ]
 }

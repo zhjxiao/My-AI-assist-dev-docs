@@ -1,0 +1,87 @@
+{
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/menus/${menuId}/config/versions/${id}"
+  },
+  "body": [
+    {
+      "type": "form",
+      "wrapWithPanel": false,
+      "body": [
+        {
+          "type": "static",
+          "name": "data.versionId",
+          "label": "版本ID",
+          "value": "${data.versionId}"
+        },
+        {
+          "type": "static",
+          "name": "data.menuId",
+          "label": "菜单ID",
+          "value": "${data.menuId}"
+        },
+        {
+          "type": "textarea",
+          "name": "data.note",
+          "label": "说明"
+        },
+        {
+          "type": "divider"
+        },
+        {
+          "type": "tpl",
+          "tpl": "<h4>dataScopePolicy</h4>"
+        },
+        {
+          "type": "json-editor",
+          "name": "data.dataScopePolicy",
+          "label": false
+        },
+        {
+          "type": "tpl",
+          "tpl": "<h4>requiredPermissions</h4>"
+        },
+        {
+          "type": "json-editor",
+          "name": "data.requiredPermissions",
+          "label": false
+        },
+        {
+          "type": "tpl",
+          "tpl": "<h4>menuActions</h4>"
+        },
+        {
+          "type": "json-editor",
+          "name": "data.menuActions",
+          "label": false
+        },
+        {
+          "type": "tpl",
+          "tpl": "<h4>fieldPolicies</h4>"
+        },
+        {
+          "type": "json-editor",
+          "name": "data.fieldPolicies",
+          "label": false
+        },
+        {
+          "type": "tpl",
+          "tpl": "<h4>actionPolicies</h4>"
+        },
+        {
+          "type": "json-editor",
+          "name": "data.actionPolicies",
+          "label": false
+        }
+      ],
+      "api": {
+        "method": "put",
+        "url": "/api/menus/${menuId}/config/versions/${id}",
+        "data": {
+          "bundle": "${data}"
+        }
+      }
+    }
+  ]
+}

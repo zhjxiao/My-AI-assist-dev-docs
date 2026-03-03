@@ -1,1 +1,34 @@
-{}
+{
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/roles/${id}/permissions",
+    "adaptor": "if(!payload)return {status:500,msg:'EMPTY'}; if(payload.code!==0)return {status:payload.code||500,msg:payload.message||'ERROR'}; return {status:0,data:{rolePerms:payload.data||[]}};"
+  },
+  "body": [
+    {
+      "type": "form",
+      "wrapWithPanel": false,
+      "body": [
+        {
+          "type": "transfer",
+          "name": "permissions",
+          "label": "权限点",
+          "searchable": true,
+          "source": {
+            "method": "get",
+            "url": "/assets/permissions-tree.json"
+          },
+          "value": "${rolePerms}"
+        }
+      ],
+      "api": {
+        "method": "put",
+        "url": "/api/roles/${id}/permissions",
+        "data": {
+          "permissions": "${permissions}"
+        }
+      }
+    }
+  ]
+}

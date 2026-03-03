@@ -1,0 +1,38 @@
+{
+  "type": "service",
+  "api": {
+    "method": "get",
+    "url": "/api/menus/${menuId}/config/diff",
+    "data": {
+      "fromVersionId": "${fromVersionId}",
+      "toVersionId": "${toVersionId}"
+    }
+  },
+  "body": [
+    {
+      "type": "crud",
+      "syncLocation": false,
+      "source": "${data.changes}",
+      "columns": [
+        {
+          "name": "changeType",
+          "label": "类型"
+        },
+        {
+          "name": "path",
+          "label": "路径"
+        },
+        {
+          "name": "before",
+          "label": "Before",
+          "type": "json"
+        },
+        {
+          "name": "after",
+          "label": "After",
+          "type": "json"
+        }
+      ]
+    }
+  ]
+}

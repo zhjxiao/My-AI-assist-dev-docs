@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "module": "user",
+    "actions": [
+      {
+        "key": "user:create",
+        "title": "新增"
+      },
+      {
+        "key": "user:delete",
+        "title": "删除"
+      }
+    ]
+  }
+]

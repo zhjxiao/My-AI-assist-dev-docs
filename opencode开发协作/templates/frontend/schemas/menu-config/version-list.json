@@ -1,0 +1,185 @@
+{
+  "type": "page",
+  "title": "菜单配置版本",
+  "data": { "__perms": "${__perms}" },
+  "body": [
+    {
+      "type": "crud",
+      "name": "verCrud",
+      "syncLocation": false,
+      "api": {
+        "method": "get",
+        "url": "/api/menus/${menuId}/config/versions",
+        "data": { "pageNo": "${page}", "pageSize": "${perPage}" },
+        "adaptor": "if(!payload)return {status:500,msg:'EMPTY'}; if(payload.code!==0)return {status:payload.code||500,msg:payload.message||'ERROR'}; return {status:0,data:{items:payload.data.items||[],total:payload.data.total||0,activeVersionId:payload.data.activeVersionId}};"
+      },
+      "pageField": "page",
+      "perPageField": "perPage",
+      "perPage": 20,
+      "headerToolbar": [
+        {
+          "type": "button",
+          "label": "新建草稿",
+          "level": "primary",
+          "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:version:create')>=0",
+          "actionType": "dialog",
+          "dialog": {
+            "title": "新建草稿版本",
+            "body": {
+              "type": "form",
+              "api": { "method": "post", "url": "/api/menus/${menuId}/config/versions" },
+              "body": [
+                { "type": "input-text", "name": "basedOnVersionId", "label": "基于版本(可空)" },
+                { "type": "textarea", "name": "note", "label": "说明" }
+              ]
+            }
+          }
+        },
+        {
+          "type": "button",
+          "label": "导出当前生效",
+          "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:export')>=0",
+          "actionType": "ajax",
+          "api": { "method": "get", "url": "/api/menus/${menuId}/config/export" }
+        },
+        {
+          "type": "button",
+          "label": "导入为草稿",
+          "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:import')>=0",
+          "actionType": "dialog",
+          "dialog": {
+            "title": "导入配置包",
+            "size": "xl",
+            "body": {
+              "type": "form",
+              "api": { "method": "post", "url": "/api/menus/${menuId}/config/import" },
+              "body": [
+                { "type": "textarea", "name": "note", "label": "导入说明" },
+                { "type": "json-editor", "name": "bundle", "label": "配置包(JSON)", "required": true }
+              ]
+            }
+          }
+        },
+        "pagination"
+      ],
+      "columns": [
+        { "name": "id", "label": "版本ID" },
+        { "name": "status", "label": "状态" },
+        { "name": "isActive", "label": "生效", "type": "switch", "disabled": true },
+        { "name": "basedOn", "label": "基于版本" },
+        { "name": "note", "label": "说明" },
+        { "name": "createdAt", "label": "创建时间", "type": "date", "format": "YYYY-MM-DD HH:mm:ss" },
+        {
+          "type": "operation",
+          "label": "操作",
+          "buttons": [
+            {
+              "type": "button",
+              "label": "编辑包",
+              "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:version:read')>=0",
+              "actionType": "drawer",
+              "drawer": { "title": "编辑配置包", "size": "xl", "body": { "$ref": "/schemas/menu-config/version-editor.json" } }
+            },
+            {
+              "type": "button",
+              "label": "复制为草稿",
+              "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:copy')>=0",
+              "actionType": "dialog",
+              "dialog": {
+                "title": "复制版本为草稿",
+                "body": {
+                  "type": "form",
+                  "api": { "method": "post", "url": "/api/menus/${menuId}/config/copy" },
+                  "body": [
+                    { "type": "static", "name": "fromVersionId", "label": "源版本", "value": "${id}" },
+                    { "type": "textarea", "name": "note", "label": "说明" }
+                  ],
+                  "data": { "fromVersionId": "${id}" }
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "对比生效版本",
+              "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:diff')>=0",
+              "actionType": "drawer",
+              "drawer": {
+                "title": "版本差异",
+                "size": "xl",
+                "body": {
+                  "$ref": "/schemas/menu-config/diff-viewer.json",
+                  "data": { "fromVersionId": "${id}", "toVersionId": "${activeVersionId}" }
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "生成摘要",
+              "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:summary')>=0",
+              "actionType": "drawer",
+              "drawer": {
+                "title": "变更摘要",
+                "size": "lg",
+                "body": {
+                  "type": "service",
+                  "api": {
+                    "method": "get",
+                    "url": "/api/menus/${menuId}/config/summary",
+                    "data": { "versionId": "${id}", "baseVersionId": "${activeVersionId}" }
+                  },
+                  "body": [
+                    { "type": "tpl", "tpl": "<pre style='white-space:pre-wrap'>${data.text}</pre>" },
+                    {
+                      "type": "list",
+                      "source": "${data.bullets}",
+                      "listItem": { "type": "tpl", "tpl": "• ${item}" },
+                      "visibleOn": "data.bullets && data.bullets.length>0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "从OpenAPI重建草稿",
+              "level": "warning",
+              "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:rebuild')>=0",
+              "actionType": "dialog",
+              "dialog": {
+                "title": "从 OpenAPI 默认重建",
+                "body": {
+                  "type": "form",
+                  "api": { "method": "post", "url": "/api/menus/${menuId}/config/rebuild-from-openapi" },
+                  "body": [
+                    { "type": "textarea", "name": "note", "label": "说明", "placeholder": "可写：重建原因/变更点" },
+                    { "type": "switch", "name": "keepCanaryRules", "label": "保留灰度规则", "value": true },
+                    { "type": "switch", "name": "keepActive", "label": "不改变当前生效版本", "value": true }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "button",
+              "label": "发布",
+              "level": "primary",
+              "visibleOn": "this.__perms && this.__perms.indexOf('menu:config:publish')>=0 && this.status==='DRAFT'",
+              "actionType": "dialog",
+              "dialog": {
+                "title": "发布版本",
+                "body": {
+                  "type": "form",
+                  "api": { "method": "post", "url": "/api/menus/${menuId}/config/publish" },
+                  "body": [
+                    { "type": "static", "name": "versionId", "label": "版本ID", "value": "${id}" },
+                    { "type": "textarea", "name": "note", "label": "发布说明" }
+                  ],
+                  "data": { "versionId": "${id}" }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
