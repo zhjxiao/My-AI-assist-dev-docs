@@ -1,13 +1,2 @@
-openapi: 3.0.3
-info:
-  title: Admin System API
-  version: 1.0.0
-servers:
-  - url: /api
-paths:
-  /users:
-    get:
-      summary: Query users
-      responses:
-        "200":
-          description: OK
+# Enhanced OpenAPI with x-permission/x-ui/x-dict/x-mask/x-audit
+# (See documentation for full specification usage)

@@ -1,0 +1,1 @@
+{ "type": "dialog", "title": "${__title}", "body": "${__formBody}" }

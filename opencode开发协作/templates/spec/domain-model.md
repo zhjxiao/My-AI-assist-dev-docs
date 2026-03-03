@@ -1,3 +1,3 @@
-# Domain Model
+# Domain Model Definitions
 
-User, Approval, Org definitions.
+Define field meanings, enums, and labels here.
